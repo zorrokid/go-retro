@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -93,6 +94,7 @@ func (ui *GoRetroUi) makeListTab(_ fyne.Window) fyne.CanvasObject {
 	icon := widget.NewIcon(nil)
 	label := widget.NewLabel("Select An Item From The List")
 	hbox := container.NewHBox(icon, label)
+	titleContent := ui.makeSelectedTitleContent(1)
 
 	ui.list = widget.NewList(
 		func() int {
@@ -114,5 +116,30 @@ func (ui *GoRetroUi) makeListTab(_ fyne.Window) fyne.CanvasObject {
 		icon.SetResource(nil)
 	}
 
-	return container.NewHSplit(ui.list, container.NewCenter(hbox))
+	return container.NewHSplit(ui.list, container.NewVSplit(hbox, titleContent))
+}
+
+func (ui *GoRetroUi) makeSelectedTitleContent(titleId int) fyne.CanvasObject {
+	icon := widget.NewIcon(nil)
+	label := widget.NewLabel("Title")
+
+	data := binding.BindStringList(
+		&[]string{"Item 1", "Item 2", "Item 3"},
+	)
+
+	add := widget.NewButton("Append", func() {
+		val := fmt.Sprintf("Item %d", data.Length()+1)
+		data.Append(val)
+	})
+	hbox := container.NewHBox(icon, label, add)
+
+	list := widget.NewListWithData(data,
+		func() fyne.CanvasObject {
+			return widget.NewLabel("template")
+		},
+		func(i binding.DataItem, o fyne.CanvasObject) {
+			o.(*widget.Label).Bind(i.(binding.String))
+		})
+
+	return container.NewVSplit(hbox, list)
 }
