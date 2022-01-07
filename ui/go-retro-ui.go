@@ -15,29 +15,42 @@ import (
 	"github.com/zorrokid/go-retro/ui/services"
 )
 
-var db *database.Database
-var titleService *services.TitleService
-var data []model.Title
-var list *widget.List
+type GoRetroUi struct {
+	app          fyne.App
+	db           *database.Database
+	titleService *services.TitleService
+	data         []model.Title
+	list         *widget.List
+}
 
-func main() {
-	db = database.NewDatabase()
+func NewGoRetroUi() *GoRetroUi {
+	db := database.NewDatabase()
 	db.InitDB()
-	titleService = services.NewTitleService(db)
-	data = titleService.GetTitles()
-
+	titleService := services.NewTitleService(db)
+	data := titleService.GetTitles()
 	app := app.New()
-	mainWindow := app.NewWindow("Go-Retro!")
-	mainWindow.SetMainMenu(makeMenu(app, mainWindow))
-	mainWindow.SetContent(makeListTab(mainWindow))
+
+	ui := &GoRetroUi{
+		app:          app,
+		db:           db,
+		titleService: titleService,
+		data:         data,
+	}
+	return ui
+}
+
+func (ui *GoRetroUi) InitAndRun() {
+	mainWindow := ui.app.NewWindow("Go-Retro!")
+	mainWindow.SetMainMenu(ui.makeMenu(ui.app, mainWindow))
+	mainWindow.SetContent(ui.makeListTab(mainWindow))
 	mainWindow.ShowAndRun()
 }
 
-func makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
+func (ui *GoRetroUi) makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 	newItem := fyne.NewMenuItem("New", nil)
 	newItem.ChildMenu = fyne.NewMenu("",
 		fyne.NewMenuItem("Title", func() {
-			openAddTitleDialog(w)
+			ui.openAddTitleDialog(w)
 		}),
 	)
 
@@ -54,7 +67,7 @@ func makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 	)
 }
 
-func openAddTitleDialog(win fyne.Window) {
+func (ui *GoRetroUi) openAddTitleDialog(win fyne.Window) {
 	titlename := widget.NewEntry()
 	items := []*widget.FormItem{
 		widget.NewFormItem("Title name", titlename),
@@ -65,43 +78,41 @@ func openAddTitleDialog(win fyne.Window) {
 			return
 		}
 		log.Println("Add title", titlename.Text)
-		titleService.AddTitle(titlename.Text)
-		refreshData()
+		ui.titleService.AddTitle(titlename.Text)
+		ui.refreshData()
 	}, win)
 }
 
-func refreshData() {
-	data = titleService.GetTitles()
-	list.Refresh()
+func (ui *GoRetroUi) refreshData() {
+	ui.data = ui.titleService.GetTitles()
+	ui.list.Refresh()
 }
 
-func makeListTab(_ fyne.Window) fyne.CanvasObject {
+func (ui *GoRetroUi) makeListTab(_ fyne.Window) fyne.CanvasObject {
 
 	icon := widget.NewIcon(nil)
 	label := widget.NewLabel("Select An Item From The List")
 	hbox := container.NewHBox(icon, label)
 
-	list = widget.NewList(
+	ui.list = widget.NewList(
 		func() int {
-			return len(data)
+			return len(ui.data)
 		},
 		func() fyne.CanvasObject {
 			return container.NewHBox(widget.NewIcon(theme.DocumentIcon()), widget.NewLabel("Template Object"))
 		},
 		func(id widget.ListItemID, item fyne.CanvasObject) {
-			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(data[id].Name)
+			item.(*fyne.Container).Objects[1].(*widget.Label).SetText(ui.data[id].Name)
 		},
 	)
-	list.OnSelected = func(id widget.ListItemID) {
-		label.SetText(data[id].Name)
+	ui.list.OnSelected = func(id widget.ListItemID) {
+		label.SetText(ui.data[id].Name)
 		icon.SetResource(theme.DocumentIcon())
 	}
-	list.OnUnselected = func(id widget.ListItemID) {
+	ui.list.OnUnselected = func(id widget.ListItemID) {
 		label.SetText("Select An Item From The List")
 		icon.SetResource(nil)
 	}
 
-	list.Select(125)
-
-	return container.NewHSplit(list, container.NewCenter(hbox))
+	return container.NewHSplit(ui.list, container.NewCenter(hbox))
 }
