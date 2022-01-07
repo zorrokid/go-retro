@@ -31,3 +31,9 @@ func (r *Repository) GetTitleByName(name string) model.Title {
 	r.db.Connection.First(&title, "name = ?", name)
 	return title
 }
+
+func (r *Repository) GetTitles() []model.Title {
+	var titles []model.Title
+	r.db.Connection.Find(&titles)
+	return titles
+}
