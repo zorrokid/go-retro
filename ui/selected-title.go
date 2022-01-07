@@ -53,3 +53,9 @@ func (selected *SelectedTitle) Update(title *model.Title) {
 	selected.titleLabel.Text = title.Name
 	selected.titleLabel.Refresh()
 }
+
+func (selected *SelectedTitle) Clear() {
+	selected.title = nil
+	selected.titleLabel.Text = ""
+	selected.titleLabel.Refresh()
+}
