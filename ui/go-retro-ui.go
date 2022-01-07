@@ -2,12 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/widget"
 	"github.com/zorrokid/go-retro/database"
 	"github.com/zorrokid/go-retro/ui/services"
 )
@@ -17,6 +14,7 @@ type GoRetroUi struct {
 	db           *database.Database
 	titleService *services.TitleService
 	list         *TitleList
+	titleDialog  *TitleDialog
 }
 
 func NewGoRetroUi() *GoRetroUi {
@@ -25,12 +23,14 @@ func NewGoRetroUi() *GoRetroUi {
 	titleService := services.NewTitleService(db)
 	app := app.New()
 	list := NewTitleList(titleService)
+	titleDialog := NewTitleDialog(titleService)
 
 	ui := &GoRetroUi{
 		app:          app,
 		db:           db,
 		titleService: titleService,
 		list:         list,
+		titleDialog:  titleDialog,
 	}
 	return ui
 }
@@ -47,7 +47,7 @@ func (ui *GoRetroUi) makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 	newItem := fyne.NewMenuItem("New", nil)
 	newItem.ChildMenu = fyne.NewMenu("",
 		fyne.NewMenuItem("Title", func() {
-			ui.openAddTitleDialog(w)
+			ui.titleDialog.ShowDialog(&w, ui.list.Update)
 		}),
 	)
 
@@ -62,20 +62,4 @@ func (ui *GoRetroUi) makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {
 		file,
 		helpMenu,
 	)
-}
-
-func (ui *GoRetroUi) openAddTitleDialog(win fyne.Window) {
-	titlename := widget.NewEntry()
-	items := []*widget.FormItem{
-		widget.NewFormItem("Title name", titlename),
-	}
-
-	dialog.ShowForm("Add title", "Add", "Cancel", items, func(b bool) {
-		if !b {
-			return
-		}
-		log.Println("Add title", titlename.Text)
-		ui.titleService.AddTitle(titlename.Text)
-		ui.list.Update()
-	}, win)
 }
