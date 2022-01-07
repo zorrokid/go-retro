@@ -45,7 +45,7 @@ func (selected *SelectedTitle) makeSelectedTitleContent() fyne.CanvasObject {
 			o.(*widget.Label).Bind(i.(binding.String))
 		})
 
-	return container.NewVSplit(hbox, itemList)
+	return container.NewBorder(hbox, nil, nil, nil, itemList)
 }
 
 func (selected *SelectedTitle) Update(title *model.Title) {

@@ -39,6 +39,7 @@ func (ui *GoRetroUi) InitAndRun() {
 	mainWindow := ui.app.NewWindow("Go-Retro!")
 	mainWindow.SetMainMenu(ui.makeMenu(ui.app, mainWindow))
 	mainWindow.SetContent(ui.list.MakeList())
+	mainWindow.Resize(fyne.NewSize(640, 460))
 	mainWindow.ShowAndRun()
 }
 
