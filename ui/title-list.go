@@ -28,9 +28,6 @@ func NewTitleList(titleService *services.TitleService) *TitleList {
 }
 
 func (list *TitleList) MakeList() fyne.CanvasObject {
-	icon := widget.NewIcon(nil)
-	label := widget.NewLabel("Select An Item From The List")
-	hbox := container.NewHBox(icon, label)
 	titleContent := list.selectedTitle.makeSelectedTitleContent()
 
 	list.list = widget.NewList(
@@ -45,16 +42,13 @@ func (list *TitleList) MakeList() fyne.CanvasObject {
 		},
 	)
 	list.list.OnSelected = func(id widget.ListItemID) {
-		label.SetText(list.data[id].Name)
-		icon.SetResource(theme.DocumentIcon())
 		list.selectedTitle.Update(&list.data[id])
 	}
 	list.list.OnUnselected = func(id widget.ListItemID) {
-		label.SetText("Select An Item From The List")
-		icon.SetResource(nil)
+		list.selectedTitle.Clear()
 	}
 
-	return container.NewHSplit(list.list, container.NewVSplit(hbox, titleContent))
+	return container.NewHSplit(list.list, titleContent)
 }
 
 func (list *TitleList) Update() {
