@@ -5,7 +5,7 @@ go 1.17
 replace github.com/zorrokid/go-retro/database => ../database
 
 require (
-	github.com/zorrokid/go-retro/database v0.0.0-00010101000000-000000000000
+	github.com/zorrokid/go-retro/database v0.0.0-20220102220145-c1a27ea4f28f
 	github.com/zorrokid/go-retro/repository v0.0.0-00010101000000-000000000000
 )
 
