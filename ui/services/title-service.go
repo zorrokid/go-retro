@@ -1,19 +1,22 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/zorrokid/go-retro/database"
 	"github.com/zorrokid/go-retro/database/model"
 	"github.com/zorrokid/go-retro/repository"
 )
 
 type TitleService struct {
-	db   *database.Database
 	repo *repository.Repository
 }
 
-func NewTitleService(db *database.Database) *TitleService {
+func NewTitleService() *TitleService {
+	db := database.NewDatabase()
+	db.InitDB()
+
 	titleService := &TitleService{
-		db:   db,
 		repo: repository.NewRepository(db),
 	}
 	return titleService
@@ -25,4 +28,9 @@ func (service *TitleService) AddTitle(titleName string) {
 
 func (service *TitleService) GetTitles() []model.Title {
 	return service.repo.GetTitles()
+}
+
+func (service *TitleService) Update(title *model.Title) {
+	fmt.Print("TitleService")
+	service.repo.Update(*title)
 }

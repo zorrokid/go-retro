@@ -16,9 +16,9 @@ type TitleList struct {
 	list          *widget.List
 }
 
-func NewTitleList(titleService *services.TitleService) *TitleList {
+func NewTitleList(titleService *services.TitleService, window *fyne.Window) *TitleList {
 	data := titleService.GetTitles()
-	selectedTitle := NewSelectedTitle(&data[0])
+	selectedTitle := NewSelectedTitle(&data[0], window, titleService)
 	list := &TitleList{
 		titleService:  titleService,
 		data:          data,

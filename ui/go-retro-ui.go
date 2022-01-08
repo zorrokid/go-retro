@@ -5,42 +5,39 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"github.com/zorrokid/go-retro/database"
 	"github.com/zorrokid/go-retro/ui/services"
 )
 
 type GoRetroUi struct {
 	app          fyne.App
-	db           *database.Database
 	titleService *services.TitleService
 	list         *TitleList
 	titleDialog  *TitleDialog
+	window       fyne.Window
 }
 
 func NewGoRetroUi() *GoRetroUi {
-	db := database.NewDatabase()
-	db.InitDB()
-	titleService := services.NewTitleService(db)
+	titleService := services.NewTitleService()
 	app := app.New()
-	list := NewTitleList(titleService)
+	window := app.NewWindow("Go-Retro!")
+	list := NewTitleList(titleService, &window)
 	titleDialog := NewTitleDialog(titleService)
 
 	ui := &GoRetroUi{
 		app:          app,
-		db:           db,
 		titleService: titleService,
 		list:         list,
 		titleDialog:  titleDialog,
+		window:       window,
 	}
 	return ui
 }
 
 func (ui *GoRetroUi) InitAndRun() {
-	mainWindow := ui.app.NewWindow("Go-Retro!")
-	mainWindow.SetMainMenu(ui.makeMenu(ui.app, mainWindow))
-	mainWindow.SetContent(ui.list.MakeList())
-	mainWindow.Resize(fyne.NewSize(640, 460))
-	mainWindow.ShowAndRun()
+	ui.window.SetMainMenu(ui.makeMenu(ui.app, ui.window))
+	ui.window.SetContent(ui.list.MakeList())
+	ui.window.Resize(fyne.NewSize(640, 460))
+	ui.window.ShowAndRun()
 }
 
 func (ui *GoRetroUi) makeMenu(a fyne.App, w fyne.Window) *fyne.MainMenu {

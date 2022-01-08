@@ -8,18 +8,23 @@ import (
 	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
 	"github.com/zorrokid/go-retro/database/model"
+	"github.com/zorrokid/go-retro/ui/services"
 )
 
 type SelectedTitle struct {
-	title      *model.Title
-	titleLabel *widget.Label
+	title        *model.Title
+	titleLabel   *widget.Label
+	titleService *services.TitleService
+	window       *fyne.Window
 }
 
-func NewSelectedTitle(title *model.Title) *SelectedTitle {
+func NewSelectedTitle(title *model.Title, window *fyne.Window, titleService *services.TitleService) *SelectedTitle {
 	titleLabel := widget.NewLabel(title.Name)
 	selectedTitle := &SelectedTitle{
-		title:      title,
-		titleLabel: titleLabel,
+		title:        title,
+		titleLabel:   titleLabel,
+		window:       window,
+		titleService: titleService,
 	}
 	return selectedTitle
 }
@@ -31,9 +36,10 @@ func (selected *SelectedTitle) makeSelectedTitleContent() fyne.CanvasObject {
 		&[]string{"Item 1", "Item 2", "Item 3"},
 	)
 
-	add := widget.NewButton("Append", func() {
-		val := fmt.Sprintf("Item %d", data.Length()+1)
-		data.Append(val)
+	add := widget.NewButton("Add release", func() {
+		//val := fmt.Sprintf("Item %d", data.Length()+1)
+		//data.Append(val)
+		selected.openReleaseDialog()
 	})
 	hbox := container.NewHBox(icon, selected.titleLabel, add)
 
@@ -58,4 +64,16 @@ func (selected *SelectedTitle) Clear() {
 	selected.title = nil
 	selected.titleLabel.Text = ""
 	selected.titleLabel.Refresh()
+}
+
+func (s *SelectedTitle) openReleaseDialog() {
+	releaseDialog := NewReleaseDialog(s.titleService)
+	releaseDialog.ShowDialog(s.window, s.title, s.update)
+}
+
+func (s *SelectedTitle) update() {
+	fmt.Println("updated, print releases")
+	for _, r := range s.title.Releases {
+		fmt.Println(r.Edition)
+	}
 }
