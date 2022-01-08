@@ -24,5 +24,6 @@ func NewDatabase() *Database {
 }
 
 func (db *Database) InitDB() {
+	db.Connection.AutoMigrate(&model.Release{})
 	db.Connection.AutoMigrate(&model.Title{})
 }

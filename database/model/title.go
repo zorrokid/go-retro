@@ -4,5 +4,6 @@ import "gorm.io/gorm"
 
 type Title struct {
 	gorm.Model
-	Name string
+	Name     string
+	Releases []Release
 }
