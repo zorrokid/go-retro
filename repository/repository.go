@@ -36,7 +36,7 @@ func (r *Repository) GetTitleByName(name string) model.Title {
 
 func (r *Repository) GetTitles() []model.Title {
 	var titles []model.Title
-	r.db.Connection.Find(&titles)
+	r.db.Connection.Preload("Releases").Find(&titles)
 	return titles
 }
 
