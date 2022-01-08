@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/zorrokid/go-retro/database"
 	"github.com/zorrokid/go-retro/database/model"
 )
@@ -36,4 +38,9 @@ func (r *Repository) GetTitles() []model.Title {
 	var titles []model.Title
 	r.db.Connection.Find(&titles)
 	return titles
+}
+
+func (r *Repository) Update(title model.Title) {
+	fmt.Println("Update")
+	r.db.Connection.Save(title)
 }

@@ -4,7 +4,7 @@ go 1.17
 
 replace github.com/zorrokid/go-retro/database => ../database
 
-require github.com/zorrokid/go-retro/database v0.0.0-20220102220145-c1a27ea4f28f
+require github.com/zorrokid/go-retro/database v0.0.0-20220107225113-b9b770b3cc85
 
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
