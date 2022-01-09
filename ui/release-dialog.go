@@ -1,8 +1,12 @@
 package main
 
 import (
+	"archive/zip"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
+	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -28,7 +32,7 @@ func NewReleaseDialog(titleService *services.TitleService) *ReleaseDialog {
 func (td *ReleaseDialog) ShowDialog(win *fyne.Window, title *model.Title, update func()) {
 	edition := widget.NewEntry()
 
-	fileButton := widget.NewButton("File Open With Filter (.jpg or .png)", func() {
+	screenshotButton := widget.NewButton("Select screenshot (.jpg or .png)", func() {
 		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 			if err != nil {
 				dialog.ShowError(err, *win)
@@ -45,9 +49,27 @@ func (td *ReleaseDialog) ShowDialog(win *fyne.Window, title *model.Title, update
 		fd.Show()
 	})
 
+	archiveFileButton := widget.NewButton("Select archive (.zip or .7z)", func() {
+		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+			if err != nil {
+				dialog.ShowError(err, *win)
+				return
+			}
+			if reader == nil {
+				log.Println("Cancelled")
+				return
+			}
+
+			readContent(reader)
+		}, *win)
+		fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip", ".7z"}))
+		fd.Show()
+	})
+
 	items := []*widget.FormItem{
 		widget.NewFormItem("Edition", edition),
-		widget.NewFormItem("Browse", fileButton),
+		widget.NewFormItem("Browse screenshots", screenshotButton),
+		widget.NewFormItem("Browse archive files", archiveFileButton),
 	}
 
 	dialog.ShowForm("Add release", "Add", "Cancel", items, func(b bool) {
@@ -97,4 +119,41 @@ func showImage(f fyne.URIReadCloser) {
 	w.SetContent(container.NewScroll(img))
 	w.Resize(fyne.NewSize(320, 240))
 	w.Show()
+}
+
+func readContent(f fyne.URIReadCloser) {
+
+	if f == nil {
+		log.Println("Cancelled")
+		return
+	}
+	defer f.Close()
+
+	fmt.Println(f.URI().Name())
+
+	fmt.Println(f.URI().Path())
+
+	// Open a zip archive for reading.
+	r, err := zip.OpenReader(f.URI().Path())
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer r.Close()
+
+	// Iterate through the files in the archive,
+	// printing some of their contents.
+	for _, f := range r.File {
+		fmt.Printf("Contents of %s:\n", f.Name)
+		rc, err := f.Open()
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = io.CopyN(os.Stdout, rc, 68)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rc.Close()
+		fmt.Println()
+	}
+
 }
