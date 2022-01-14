@@ -3,12 +3,11 @@ package archive
 import (
 	"archive/zip"
 	"crypto/sha1"
-	"fmt"
 	"io"
 	"log"
 )
 
-func ReadZip(filePath string) {
+func ReadZip(filePath string) []ArchiveFile {
 
 	r, err := zip.OpenReader(filePath)
 	if err != nil {
@@ -16,21 +15,28 @@ func ReadZip(filePath string) {
 	}
 	defer r.Close()
 
+	files := make([]ArchiveFile, len(r.File))
+
 	for _, f := range r.File {
-		fmt.Printf("Checksum of %s:\n", f.Name)
 		rc, err := f.Open()
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer rc.Close()
 
 		hash := sha1.New()
-		if _, err := io.Copy(hash, rc); err != nil {
+		bytesCopied, err := io.Copy(hash, rc)
+
+		if err != nil {
 			log.Fatal(err)
 		}
 		sum := hash.Sum(nil)
-
-		fmt.Printf("%x\n", sum)
-		rc.Close()
-		fmt.Println()
+		af := ArchiveFile{
+			CheckSum:        sum,
+			FileName:        f.Name,
+			FileSizeInBytes: bytesCopied,
+		}
+		files = append(files, af)
 	}
+	return files
 }
