@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"fyne.io/fyne/v2"
@@ -58,7 +59,11 @@ func (td *ReleaseDialog) ShowDialog(win *fyne.Window, title *model.Title, update
 
 			defer reader.Close()
 
-			archive.ReadZip(reader.URI().Path())
+			files := archive.ReadZip(reader.URI().Path())
+
+			for _, file := range files {
+				fmt.Printf("%s %x\n", file.FileName, file.CheckSum)
+			}
 		}, *win)
 		fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip", ".7z"}))
 		fd.Show()
