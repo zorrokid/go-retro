@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
+	"github.com/zorrokid/go-retro/archive"
 	"github.com/zorrokid/go-retro/database/model"
 	"github.com/zorrokid/go-retro/ui/services"
 	"github.com/zorrokid/go-retro/ui/util"
@@ -57,7 +58,7 @@ func (td *ReleaseDialog) ShowDialog(win *fyne.Window, title *model.Title, update
 
 			defer reader.Close()
 
-			util.ReadZip(reader.URI().Path())
+			archive.ReadZip(reader.URI().Path())
 		}, *win)
 		fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip", ".7z"}))
 		fd.Show()

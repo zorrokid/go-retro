@@ -24,6 +24,7 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20210519020934-456a8d69b780 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/yuin/goldmark v1.4.4 // indirect
+	github.com/zorrokid/go-retro/archive v0.0.0-00010101000000-000000000000 // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
@@ -36,3 +37,5 @@ require (
 replace github.com/zorrokid/go-retro/repository => ../repository
 
 replace github.com/zorrokid/go-retro/database => ../database
+
+replace github.com/zorrokid/go-retro/archive => ../archive
