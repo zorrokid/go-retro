@@ -59,10 +59,13 @@ func (td *ReleaseDialog) ShowDialog(win *fyne.Window, title *model.Title, update
 
 			defer reader.Close()
 
+			file := archive.ReadFileInfo(reader.URI().Path())
+			fmt.Printf("%s %x\n", file.FileName, file.CheckSum)
+
 			files := archive.ReadZip(reader.URI().Path())
 
-			for _, file := range files {
-				fmt.Printf("%s %x\n", file.FileName, file.CheckSum)
+			for _, f := range files {
+				fmt.Printf("%s %x\n", f.FileName, f.CheckSum)
 			}
 		}, *win)
 		fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip", ".7z"}))
