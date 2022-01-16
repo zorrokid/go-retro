@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Release struct {
 	gorm.Model
-	Edition string
-	TitleId uint
+	Edition       string
+	TitleId       uint
+	FileContainer []FileContainer
 }
